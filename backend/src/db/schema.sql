@@ -29,7 +29,9 @@ CREATE INDEX IF NOT EXISTS chunks_embedding_idx
 CREATE TABLE IF NOT EXISTS conversations (
   id         UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
   title      TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  deleted_at TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS messages (
@@ -52,5 +54,11 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS documents_set_updated_at ON documents;
 CREATE TRIGGER documents_set_updated_at
 BEFORE UPDATE ON documents
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+DROP TRIGGER IF EXISTS conversations_set_updated_at ON conversations;
+CREATE TRIGGER conversations_set_updated_at
+BEFORE UPDATE ON conversations
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();

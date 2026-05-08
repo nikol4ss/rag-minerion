@@ -23,4 +23,12 @@ export const conversationParamsSchema = z.object({
   id: z.string().uuid('ID de conversa inválido.')
 });
 
+export const conversationUpdateSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Nome da conversa é obrigatório.')
+    .max(120, 'Nome da conversa deve ter até 120 caracteres.')
+});
+
 export type ChatMessageInput = z.infer<typeof chatMessageSchema>;

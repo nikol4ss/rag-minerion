@@ -21,8 +21,8 @@ function navClass(path: string): string {
             <Bot class="h-5 w-5" />
           </span>
           <span class="min-w-0">
-            <span class="block truncate font-mono text-base font-bold uppercase leading-5 text-minerion-ink">RAG Minerion</span>
-            <span class="hidden truncate text-xs font-medium text-minerion-green sm:block">Base de conhecimento para mineração</span>
+            <span class="block truncate font-mono text-base font-bold uppercase leading-5 text-minerion-ink">IA Minerion</span>
+            <span class="hidden truncate text-xs font-medium text-minerion-green sm:block">Conhecimento interno com contexto controlado</span>
           </span>
         </RouterLink>
 

@@ -37,7 +37,7 @@ function onKeydown(event: KeyboardEvent): void {
       v-model="draft"
       class="max-h-36 min-h-12 flex-1 resize-none rounded-md border-0 bg-transparent px-2 py-2 text-sm leading-6 text-minerion-ink outline-none placeholder:text-minerion-graphite/45"
       rows="1"
-      placeholder="Pergunte sobre processos, regras ou manuais cadastrados"
+      placeholder="Pergunte algo sobre a Minerion ou sobre documentos ensinados"
       :disabled="disabled"
       @keydown="onKeydown"
     />

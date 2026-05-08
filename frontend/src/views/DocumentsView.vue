@@ -78,7 +78,7 @@ onUnmounted(() => {
           @click="showClearAll = true"
         >
           <Trash2 class="h-4 w-4" />
-          Apagar base
+          Apagar base RAG
         </button>
         <RouterLink
           to="/upload"
@@ -157,9 +157,9 @@ onUnmounted(() => {
             <AlertTriangle class="h-5 w-5" />
           </span>
           <div>
-            <h2 class="text-lg font-semibold text-minerion-ink">Apagar todos os dados?</h2>
+            <h2 class="text-lg font-semibold text-minerion-ink">Apagar base de documentos?</h2>
             <p class="mt-2 text-sm leading-6 text-minerion-graphite/70">
-              Esta ação remove documentos, chunks, conversas e mensagens do banco. Use para reiniciar testes de ingestão.
+              Esta ação remove documentos e chunks indexados. Conversas e mensagens permanecem no banco para preservar a memória operacional.
             </p>
           </div>
         </div>
@@ -179,7 +179,7 @@ onUnmounted(() => {
             @click="confirmClearAll"
           >
             <span v-if="clearing" class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            Apagar tudo
+            Apagar base
           </button>
         </div>
       </section>

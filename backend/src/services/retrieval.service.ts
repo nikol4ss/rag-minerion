@@ -12,7 +12,7 @@ const OPENAI_SIMILARITY_THRESHOLD = 0.75;
 const LOCAL_SIMILARITY_THRESHOLD = 0.08;
 const TOP_K = 5;
 const NO_CONTEXT_ANSWER =
-  'Não encontrei essa informação na base de conhecimento. Envie uma pergunta sobre os documentos já indexados ou faça upload dos arquivos da Minerion para testar.';
+  'Essa pergunta está fora do contexto da Minerion ou não existe na base cadastrada. Eu só respondo com segurança sobre informações ensinadas nos documentos da Minerion. Para eu aprender esse assunto, cadastre o conteúdo em Documentos ou faça upload de um arquivo.';
 
 let openaiClient: OpenAI | null = null;
 
@@ -72,11 +72,11 @@ function toVectorLiteral(embedding: number[]): string {
 }
 
 function buildSystemPrompt(context: string): string {
-  return `Você é um assistente especializado nos processos internos da empresa.
-Responda APENAS com base nos documentos fornecidos.
+  return `Você é a IA da Minerion, uma assistente especializada apenas na base de conhecimento da Minerion.
+Responda APENAS com base nos documentos fornecidos, no que foi ensinado e no histórico da conversa quando ele estiver apoiado nesses documentos.
 Seja objetivo, cite o módulo e o documento de origem.
-Se a informação não estiver nos documentos, responda: "Essa informação não está na base de conhecimento cadastrada."
-Nunca invente informações. Nunca use conhecimento externo.
+Se a pergunta for sobre política, notícias, cultura geral, programação, saúde, finanças externas, ou qualquer tema que não esteja claramente ligado à Minerion e aos documentos recuperados, responda: "Essa informação está fora do contexto da Minerion ou não está na base cadastrada."
+Nunca invente informações. Nunca use conhecimento externo. Nunca responda como se soubesse algo que não esteja no contexto.
 
 DOCUMENTOS:
 ${context}`;
@@ -143,7 +143,7 @@ function getStaticAssistantReply(question: string): string | null {
   const helpRequests = new Set(['ajuda', 'me ajuda', 'o que voce faz', 'o que posso perguntar']);
 
   if (greetings.has(normalizedQuestion)) {
-    return 'Olá! Sou o assistente RAG Minerion. Posso responder perguntas com base nos documentos indexados, como módulos, segmentos, história, soluções e contatos da Minerion.';
+    return 'Olá! Sou a IA da Minerion. Posso responder com base nos documentos indexados e no que for ensinado na base de conhecimento da Minerion.';
   }
 
   if (thanks.has(normalizedQuestion)) {
@@ -151,7 +151,7 @@ function getStaticAssistantReply(question: string): string | null {
   }
 
   if (helpRequests.has(normalizedQuestion)) {
-    return 'Você pode perguntar sobre a Minerion usando os documentos cadastrados. Exemplos: "Quais módulos a Minerion oferece?", "Quais segmentos são atendidos?" ou "Quando a Delphi virou Minerion?".';
+    return 'Você pode perguntar sobre a Minerion usando os documentos cadastrados. Exemplos: "Quais módulos a Minerion oferece?", "Quais segmentos são atendidos?" ou "Quando a Delphi virou Minerion?". Se o assunto não estiver nessa base, eu aviso que está fora do contexto.';
   }
 
   return null;
@@ -242,19 +242,23 @@ async function retrieveRelevantChunks(db: Kysely<Database>, question: string): P
     getAiProvider() === 'openai' ? OPENAI_SIMILARITY_THRESHOLD : LOCAL_SIMILARITY_THRESHOLD;
 
   const result = await sql<RetrievedChunk>`
-    SELECT
-      c.id,
-      c.content,
-      c.chunk_index,
-      d.id AS document_id,
-      d.title,
-      d.module,
-      1 - (c.embedding <=> ${vector}::vector) AS similarity
-    FROM chunks c
-    INNER JOIN documents d ON d.id = c.document_id
-    WHERE c.embedding IS NOT NULL
-      AND 1 - (c.embedding <=> ${vector}::vector) >= ${similarityThreshold}
-    ORDER BY c.embedding <=> ${vector}::vector
+    WITH scored_chunks AS (
+      SELECT
+        c.id,
+        c.content,
+        c.chunk_index,
+        d.id AS document_id,
+        d.title,
+        d.module,
+        1 - (c.embedding <=> ${vector}::vector) AS similarity
+      FROM chunks c
+      INNER JOIN documents d ON d.id = c.document_id
+      WHERE c.embedding IS NOT NULL
+    )
+    SELECT *
+    FROM scored_chunks
+    WHERE similarity >= ${similarityThreshold}
+    ORDER BY similarity DESC
     LIMIT ${TOP_K}
   `.execute(db);
 

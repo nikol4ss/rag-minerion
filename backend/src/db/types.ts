@@ -28,6 +28,8 @@ export interface ConversationsTable {
   id: Generated<string>;
   title: string | null;
   created_at: Generated<Timestamp>;
+  updated_at: Timestamp;
+  deleted_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
 }
 
 export type MessageRole = 'user' | 'assistant';
@@ -37,7 +39,7 @@ export interface MessagesTable {
   conversation_id: string;
   role: MessageRole;
   content: string;
-  sources: ColumnType<Source[] | null, Source[] | null | undefined, Source[] | null>;
+  sources: ColumnType<Source[] | null, string | null | undefined, string | null>;
   created_at: Generated<Timestamp>;
 }
 

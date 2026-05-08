@@ -78,6 +78,17 @@ export const chatApi = {
   async messages(conversationId: string): Promise<ChatMessage[]> {
     const response = await api.get<{ messages: ChatMessage[] }>(`/chat/conversations/${conversationId}/messages`);
     return response.data.messages;
+  },
+
+  async renameConversation(conversationId: string, title: string): Promise<Conversation> {
+    const response = await api.put<{ conversation: Conversation }>(`/chat/conversations/${conversationId}`, {
+      title
+    });
+    return response.data.conversation;
+  },
+
+  async deleteConversation(conversationId: string): Promise<void> {
+    await api.delete(`/chat/conversations/${conversationId}`);
   }
 };
 

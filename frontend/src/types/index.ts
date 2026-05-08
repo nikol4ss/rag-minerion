@@ -11,6 +11,7 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   sources?: Source[] | null;
+  tokensUsed?: number;
   created_at?: string;
 }
 
@@ -18,6 +19,7 @@ export interface Conversation {
   id: string;
   title: string | null;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface DocumentItem {
@@ -32,6 +34,7 @@ export interface DocumentItem {
 export interface ChatResponse {
   answer: string;
   sources: Source[];
+  tokensUsed: number;
   conversationId: string;
 }
 

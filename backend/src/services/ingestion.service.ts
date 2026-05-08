@@ -144,9 +144,5 @@ export async function deleteDocument(db: Kysely<Database>, id: string): Promise<
 }
 
 export async function clearKnowledgeBase(db: Kysely<Database>): Promise<void> {
-  await db.transaction().execute(async (transaction) => {
-    await transaction.deleteFrom('messages').execute();
-    await transaction.deleteFrom('conversations').execute();
-    await transaction.deleteFrom('documents').execute();
-  });
+  await db.deleteFrom('documents').execute();
 }

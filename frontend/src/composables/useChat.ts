@@ -53,7 +53,8 @@ export function useChat() {
       store.messages.push({
         role: 'assistant',
         content: response.answer,
-        sources: response.sources
+        sources: response.sources,
+        tokensUsed: response.tokensUsed
       });
       await loadConversations();
     } catch (error) {
@@ -68,11 +69,49 @@ export function useChat() {
     }
   }
 
+  async function renameConversation(conversationId: string, title: string): Promise<void> {
+    const trimmedTitle = title.trim();
+
+    if (!trimmedTitle) {
+      return;
+    }
+
+    store.error = null;
+
+    try {
+      const updatedConversation = await chatApi.renameConversation(conversationId, trimmedTitle);
+      store.conversations = store.conversations.map((conversation) =>
+        conversation.id === conversationId ? updatedConversation : conversation
+      );
+    } catch (error) {
+      store.error = getApiErrorMessage(error);
+      throw error;
+    }
+  }
+
+  async function deleteConversation(conversationId: string): Promise<void> {
+    store.error = null;
+
+    try {
+      await chatApi.deleteConversation(conversationId);
+      store.conversations = store.conversations.filter((conversation) => conversation.id !== conversationId);
+
+      if (store.currentConversationId === conversationId) {
+        store.startNewConversation();
+      }
+    } catch (error) {
+      store.error = getApiErrorMessage(error);
+      throw error;
+    }
+  }
+
   return {
     ...refs,
     startNewConversation: store.startNewConversation,
     loadConversations,
     loadMessages,
-    sendMessage
+    sendMessage,
+    renameConversation,
+    deleteConversation
   };
 }

@@ -3,6 +3,7 @@ import {
   chatQuerySchema,
   chatRequestSchema,
   conversationParamsSchema,
+  conversationUpdateSchema,
   type ChatMessageInput
 } from '../schemas/chat.schema.js';
 import type { MessageRole } from '../db/types.js';
@@ -90,8 +91,14 @@ async function insertMessage(
       conversation_id: conversationId,
       role,
       content,
-      sources
+      sources: sources ? JSON.stringify(sources) : null
     })
+    .execute();
+
+  await fastify.db
+    .updateTable('conversations')
+    .set({ updated_at: new Date() })
+    .where('id', '=', conversationId)
     .execute();
 }
 
@@ -179,6 +186,7 @@ export async function chatRoutes(fastify: FastifyInstance): Promise<void> {
       return {
         answer: result.answer,
         sources: result.sources,
+        tokensUsed: result.tokensUsed,
         conversationId
       };
     } catch (error) {
@@ -193,13 +201,71 @@ export async function chatRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get('/chat/conversations', async () => {
     const conversations = await fastify.db
       .selectFrom('conversations')
-      .select(['id', 'title', 'created_at'])
-      .orderBy('created_at', 'desc')
+      .select(['id', 'title', 'created_at', 'updated_at'])
+      .where('deleted_at', 'is', null)
+      .orderBy('updated_at', 'desc')
       .execute();
 
     return {
       conversations
     };
+  });
+
+  fastify.put('/chat/conversations/:id', async (request, reply) => {
+    try {
+      const params = conversationParamsSchema.parse(request.params);
+      const body = conversationUpdateSchema.parse(request.body);
+      const conversation = await fastify.db
+        .updateTable('conversations')
+        .set({
+          title: body.title,
+          updated_at: new Date()
+        })
+        .where('id', '=', params.id)
+        .where('deleted_at', 'is', null)
+        .returning(['id', 'title', 'created_at', 'updated_at'])
+        .executeTakeFirst();
+
+      if (!conversation) {
+        return reply.status(404).send({
+          message: 'Conversa não encontrada.'
+        });
+      }
+
+      return {
+        conversation
+      };
+    } catch (error) {
+      request.log.error(error);
+
+      return reply.status(400).send({
+        message: errorMessage(error)
+      });
+    }
+  });
+
+  fastify.delete('/chat/conversations/:id', async (request, reply) => {
+    try {
+      const params = conversationParamsSchema.parse(request.params);
+      await fastify.db
+        .updateTable('conversations')
+        .set({
+          deleted_at: new Date(),
+          updated_at: new Date()
+        })
+        .where('id', '=', params.id)
+        .execute();
+
+      return {
+        success: true
+      };
+    } catch (error) {
+      request.log.error(error);
+
+      return reply.status(400).send({
+        message: errorMessage(error)
+      });
+    }
   });
 
   fastify.get('/chat/conversations/:id/messages', async (request, reply) => {

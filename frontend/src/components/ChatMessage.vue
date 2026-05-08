@@ -40,6 +40,10 @@ const isAssistant = computed(() => props.message.role === 'assistant');
       <div v-if="isAssistant && message.sources?.length" class="mt-3 flex flex-wrap gap-2">
         <SourceBadge v-for="source in message.sources" :key="`${source.documentId}-${source.chunkIndex}`" :source="source" />
       </div>
+
+      <p v-if="isAssistant && message.tokensUsed" class="mt-3 border-t border-minerion-graphite/10 pt-2 font-mono text-[11px] uppercase tracking-wide text-minerion-graphite/50">
+        {{ message.tokensUsed }} tokens usados
+      </p>
     </div>
   </article>
 </template>
