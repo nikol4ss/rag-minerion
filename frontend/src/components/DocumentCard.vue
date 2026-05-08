@@ -21,15 +21,15 @@ function formatDate(value: string): string {
 </script>
 
 <template>
-  <article class="flex min-h-48 flex-col justify-between rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+  <article class="surface flex min-h-48 flex-col justify-between rounded-lg p-4 hover:-translate-y-0.5 hover:shadow-lift">
     <div class="space-y-3">
       <div class="flex items-start justify-between gap-3">
-        <h3 class="min-w-0 text-base font-semibold leading-6 text-slate-900">
+        <h3 class="min-w-0 text-base font-semibold leading-6 text-minerion-ink">
           {{ document.title }}
         </h3>
         <button
           type="button"
-          class="grid h-9 w-9 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600"
+          class="grid h-9 w-9 shrink-0 place-items-center rounded-md text-minerion-graphite/45 hover:bg-red-50 hover:text-red-600"
           title="Excluir"
           aria-label="Excluir documento"
           @click="emit('delete', document)"
@@ -48,19 +48,19 @@ function formatDate(value: string): string {
         }"
       />
 
-      <p v-if="document.description" class="line-clamp-3 text-sm leading-6 text-slate-600">
+      <p v-if="document.description" class="line-clamp-3 text-sm leading-6 text-minerion-graphite/70">
         {{ document.description }}
       </p>
     </div>
 
-    <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-sm">
+    <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-minerion-graphite/10 pt-4 text-sm">
       <div>
-        <dt class="text-slate-500">Chunks</dt>
-        <dd class="font-semibold text-slate-900">{{ document.chunk_count }}</dd>
+        <dt class="text-minerion-graphite/55">Chunks</dt>
+        <dd class="font-semibold text-minerion-ink">{{ document.chunk_count }}</dd>
       </div>
       <div>
-        <dt class="text-slate-500">Criado em</dt>
-        <dd class="font-semibold text-slate-900">{{ formatDate(document.created_at) }}</dd>
+        <dt class="text-minerion-graphite/55">Criado em</dt>
+        <dd class="font-semibold text-minerion-ink">{{ formatDate(document.created_at) }}</dd>
       </div>
     </dl>
   </article>

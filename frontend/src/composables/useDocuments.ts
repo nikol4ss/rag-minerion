@@ -63,6 +63,21 @@ export function useDocuments() {
     }
   }
 
+  async function clearAllDocuments(): Promise<void> {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      await documentsApi.clearAll();
+      documents.value = [];
+    } catch (requestError) {
+      error.value = getApiErrorMessage(requestError);
+      throw requestError;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     documents,
     loading,
@@ -70,6 +85,7 @@ export function useDocuments() {
     fetchDocuments,
     uploadDocument,
     createTextDocument,
-    deleteDocument
+    deleteDocument,
+    clearAllDocuments
   };
 }

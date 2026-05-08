@@ -24,16 +24,16 @@ const isAssistant = computed(() => props.message.role === 'assistant');
 <template>
   <article class="flex w-full gap-3" :class="isAssistant ? 'justify-start' : 'justify-end'">
     <div
-      class="max-w-[min(760px,100%)] rounded-lg px-4 py-3 shadow-sm"
+      class="max-w-[min(780px,100%)] rounded-lg px-4 py-3 shadow-sm"
       :class="
         isAssistant
-          ? 'border border-slate-200 bg-white text-slate-800'
-          : 'bg-slate-900 text-white'
+          ? 'border border-minerion-graphite/10 bg-white text-minerion-graphite'
+          : 'bg-minerion-graphite text-white'
       "
     >
       <div
         class="markdown-body text-sm leading-6"
-        :class="isAssistant ? 'text-slate-800' : 'text-white'"
+        :class="isAssistant ? 'text-minerion-graphite' : 'text-white'"
         v-html="renderedContent"
       />
 

@@ -49,6 +49,10 @@ export const documentsApi = {
 
   async remove(id: string): Promise<void> {
     await api.delete(`/documents/${id}`);
+  },
+
+  async clearAll(): Promise<void> {
+    await api.delete('/database');
   }
 };
 

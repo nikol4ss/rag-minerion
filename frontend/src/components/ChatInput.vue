@@ -32,10 +32,10 @@ function onKeydown(event: KeyboardEvent): void {
 </script>
 
 <template>
-  <form class="flex items-end gap-2 rounded-lg border border-slate-200 bg-white p-2 shadow-soft" @submit.prevent="submit">
+  <form class="surface flex items-end gap-2 rounded-lg p-2" @submit.prevent="submit">
     <textarea
       v-model="draft"
-      class="max-h-36 min-h-12 flex-1 resize-none rounded-md border-0 bg-transparent px-2 py-2 text-sm leading-6 text-slate-900 outline-none placeholder:text-slate-400"
+      class="max-h-36 min-h-12 flex-1 resize-none rounded-md border-0 bg-transparent px-2 py-2 text-sm leading-6 text-minerion-ink outline-none placeholder:text-minerion-graphite/45"
       rows="1"
       placeholder="Pergunte sobre processos, regras ou manuais cadastrados"
       :disabled="disabled"
@@ -43,7 +43,7 @@ function onKeydown(event: KeyboardEvent): void {
     />
     <button
       type="submit"
-      class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-slate-900 text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+      class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-minerion-graphite text-minerion-lime shadow-sm hover:bg-minerion-ink disabled:cursor-not-allowed disabled:bg-minerion-graphite/25 disabled:text-white"
       :disabled="disabled || !draft.trim()"
       title="Enviar"
       aria-label="Enviar"

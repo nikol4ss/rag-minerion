@@ -7,7 +7,7 @@ import {
   documentTextSchema,
   uploadFieldsSchema
 } from '../schemas/document.schema.js';
-import { deleteDocument, ingestDocument } from '../services/ingestion.service.js';
+import { clearKnowledgeBase, deleteDocument, ingestDocument } from '../services/ingestion.service.js';
 import { errorMessage } from './errors.js';
 
 type UploadFieldValue = string | undefined;
@@ -167,6 +167,22 @@ export async function documentRoutes(fastify: FastifyInstance): Promise<void> {
     try {
       const params = documentParamsSchema.parse(request.params);
       await deleteDocument(request.server.db, params.id);
+
+      return {
+        success: true
+      };
+    } catch (error) {
+      request.log.error(error);
+
+      return reply.status(400).send({
+        message: errorMessage(error)
+      });
+    }
+  });
+
+  fastify.delete('/database', async (request, reply) => {
+    try {
+      await clearKnowledgeBase(request.server.db);
 
       return {
         success: true

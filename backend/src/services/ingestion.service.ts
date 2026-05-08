@@ -142,3 +142,11 @@ export async function ingestDocument(params: IngestDocumentParams): Promise<Inge
 export async function deleteDocument(db: Kysely<Database>, id: string): Promise<void> {
   await db.deleteFrom('documents').where('id', '=', id).execute();
 }
+
+export async function clearKnowledgeBase(db: Kysely<Database>): Promise<void> {
+  await db.transaction().execute(async (transaction) => {
+    await transaction.deleteFrom('messages').execute();
+    await transaction.deleteFrom('conversations').execute();
+    await transaction.deleteFrom('documents').execute();
+  });
+}

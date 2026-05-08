@@ -35,13 +35,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="grid min-h-[calc(100vh-73px)] grid-cols-1 bg-slate-100 lg:grid-cols-[300px_1fr]">
-    <aside class="border-b border-slate-200 bg-white lg:border-b-0 lg:border-r">
-      <div class="flex items-center justify-between gap-3 border-b border-slate-100 p-4">
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Conversas</h2>
+  <div class="grid min-h-[calc(100vh-73px)] grid-cols-1 lg:grid-cols-[320px_1fr]">
+    <aside class="border-b border-minerion-graphite/10 bg-white/80 backdrop-blur lg:border-b-0 lg:border-r">
+      <div class="flex items-center justify-between gap-3 border-b border-minerion-graphite/10 p-4">
+        <h2 class="font-mono text-xs font-bold uppercase tracking-wide text-minerion-green">Conversas</h2>
         <button
           type="button"
-          class="grid h-9 w-9 place-items-center rounded-md bg-slate-900 text-white hover:bg-slate-700"
+          class="grid h-9 w-9 place-items-center rounded-md bg-minerion-graphite text-minerion-lime hover:bg-minerion-ink"
           title="Nova conversa"
           aria-label="Nova conversa"
           @click="startNewConversation"
@@ -55,8 +55,8 @@ onMounted(async () => {
           v-for="conversation in conversations"
           :key="conversation.id"
           type="button"
-          class="mb-1 w-full rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100"
-          :class="{ 'bg-slate-100 font-semibold text-slate-950': conversation.id === currentConversationId }"
+          class="mb-1 w-full rounded-md px-3 py-2 text-left text-sm text-minerion-graphite hover:bg-minerion-sand/70"
+          :class="{ 'bg-minerion-lime/35 font-semibold text-minerion-ink': conversation.id === currentConversationId }"
           @click="loadMessages(conversation.id)"
         >
           <span class="line-clamp-2">{{ conversation.title || 'Conversa sem título' }}</span>
@@ -66,20 +66,21 @@ onMounted(async () => {
 
     <main class="flex min-h-0 flex-col">
       <div ref="scrollContainer" class="flex-1 space-y-4 overflow-y-auto p-4 md:p-8">
-        <div v-if="messages.length === 0" class="mx-auto flex min-h-[45vh] max-w-2xl flex-col items-center justify-center text-center">
-          <h1 class="text-2xl font-semibold text-slate-950">Base de Conhecimento Corporativa</h1>
-          <p class="mt-3 max-w-xl text-sm leading-6 text-slate-600">
-            Faça perguntas sobre os documentos indexados.
+        <div v-if="messages.length === 0" class="mx-auto flex min-h-[48vh] max-w-2xl flex-col items-center justify-center text-center">
+          <span class="mb-4 rounded-md bg-minerion-lime px-3 py-1 font-mono text-xs font-bold uppercase text-minerion-graphite">Minerion Knowledge</span>
+          <h1 class="text-3xl font-bold text-minerion-ink md:text-4xl">Pergunte sobre a Minerion</h1>
+          <p class="mt-3 max-w-xl text-sm leading-6 text-minerion-graphite/70">
+            Use os documentos indexados para testar respostas sobre módulos, segmentos, história e posicionamento da empresa.
           </p>
         </div>
 
         <ChatMessage v-for="(message, index) in messages" :key="message.id ?? `${message.role}-${index}`" :message="message" />
 
         <div v-if="loading" class="flex justify-start">
-          <div class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-sm">
-            <span class="h-2 w-2 animate-bounce rounded-full bg-slate-400" />
-            <span class="h-2 w-2 animate-bounce rounded-full bg-slate-400 [animation-delay:120ms]" />
-            <span class="h-2 w-2 animate-bounce rounded-full bg-slate-400 [animation-delay:240ms]" />
+          <div class="inline-flex items-center gap-2 rounded-lg border border-minerion-graphite/10 bg-white px-4 py-3 text-sm text-minerion-graphite shadow-sm">
+            <span class="h-2 w-2 animate-bounce rounded-full bg-minerion-lime" />
+            <span class="h-2 w-2 animate-bounce rounded-full bg-minerion-green [animation-delay:120ms]" />
+            <span class="h-2 w-2 animate-bounce rounded-full bg-minerion-graphite [animation-delay:240ms]" />
           </div>
         </div>
 
@@ -88,7 +89,7 @@ onMounted(async () => {
         </p>
       </div>
 
-      <div class="border-t border-slate-200 bg-slate-100 p-4 md:px-8">
+      <div class="border-t border-minerion-graphite/10 bg-minerion-mist/80 p-4 md:px-8">
         <ChatInput :disabled="loading" @send="sendMessage" />
       </div>
     </main>

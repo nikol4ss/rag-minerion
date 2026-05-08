@@ -7,12 +7,12 @@ const props = defineProps<{
 }>();
 
 const moduleClasses: Record<string, string> = {
-  financeiro: 'border-blue-200 bg-blue-50 text-blue-700',
-  rh: 'border-green-200 bg-green-50 text-green-700',
-  'erp-nf': 'border-amber-200 bg-amber-50 text-amber-700',
+  financeiro: 'border-minerion-green/25 bg-minerion-green/10 text-minerion-green',
+  rh: 'border-minerion-lime/70 bg-minerion-lime/35 text-minerion-graphite',
+  'erp-nf': 'border-minerion-sand bg-minerion-sand/70 text-minerion-graphite',
   juridico: 'border-red-200 bg-red-50 text-red-700',
-  operacional: 'border-purple-200 bg-purple-50 text-purple-700',
-  geral: 'border-slate-200 bg-slate-50 text-slate-700'
+  operacional: 'border-minerion-graphite/20 bg-minerion-graphite/10 text-minerion-graphite',
+  geral: 'border-minerion-graphite/15 bg-white text-minerion-graphite'
 };
 
 const colorClass = computed(() => moduleClasses[props.source.module] ?? moduleClasses.geral);
@@ -21,7 +21,7 @@ const confidence = computed(() => `${Math.round(props.source.similarity * 100)}%
 
 <template>
   <span
-    class="inline-flex max-w-full items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium"
+    class="inline-flex max-w-full items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-semibold"
     :class="colorClass"
     :title="`${source.title} · ${confidence}`"
   >
