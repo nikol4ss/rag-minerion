@@ -6,7 +6,7 @@ Sistema RAG para indexar documentos sobre a Minerion e responder perguntas com b
 
 - Backend: Node.js, Fastify, TypeScript, Kysely, Zod
 - Banco: PostgreSQL 16 com `pgvector`
-- IA: OpenAI para embeddings e chat
+- IA: modo local gratuito por padrão; OpenAI opcional para embeddings e chat
 - Frontend: Vue 3, TypeScript, Pinia, TailwindCSS, Vite
 - Deploy local: Docker Compose
 
@@ -18,11 +18,14 @@ Sistema RAG para indexar documentos sobre a Minerion e responder perguntas com b
 cp .env.example .env
 ```
 
-2. Edite `.env` e informe sua chave:
+2. Para rodar sem pagar API, mantenha:
 
 ```bash
-OPENAI_API_KEY=sk-...
+AI_PROVIDER=local
+OPENAI_API_KEY=
 ```
+
+O modo local usa embeddings determinísticos e resposta extrativa com base nos documentos recuperados. Para usar OpenAI depois, configure `AI_PROVIDER=openai` e informe `OPENAI_API_KEY`.
 
 3. Suba tudo:
 
@@ -79,3 +82,12 @@ npm run dev
 ```
 
 Para esse modo, mantenha um PostgreSQL com `pgvector` rodando e aplique `backend/src/db/schema.sql`.
+
+## Modo Gratuito
+
+O projeto roda em `AI_PROVIDER=local` por padrão. Nesse modo:
+
+- Não há chamada para OpenAI.
+- Não precisa de crédito, cartão ou chave válida.
+- A qualidade da resposta é mais simples: o sistema recupera trechos parecidos e monta uma resposta com citações dos documentos.
+- Se trocar de `openai` para `local`, reindexe os documentos para que os embeddings fiquem no mesmo padrão do modo escolhido.

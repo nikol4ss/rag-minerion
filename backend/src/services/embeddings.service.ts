@@ -3,8 +3,15 @@ import OpenAI from 'openai';
 const EMBEDDING_MODEL = 'text-embedding-ada-002';
 const EMBEDDING_BATCH_SIZE = 10;
 const BATCH_DELAY_MS = 200;
+const LOCAL_EMBEDDING_DIMENSIONS = 1536;
 
 let openaiClient: OpenAI | null = null;
+
+export type AiProvider = 'local' | 'openai';
+
+export function getAiProvider(): AiProvider {
+  return process.env.AI_PROVIDER === 'openai' ? 'openai' : 'local';
+}
 
 function getOpenAIClient(): OpenAI {
   if (!process.env.OPENAI_API_KEY) {
@@ -22,6 +29,57 @@ function normalizeText(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
 }
 
+function tokenize(text: string): string[] {
+  return normalizeText(text)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/\s+/)
+    .filter((token) => token.length > 2);
+}
+
+function hashToken(token: string): number {
+  let hash = 2166136261;
+
+  for (let index = 0; index < token.length; index += 1) {
+    hash ^= token.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
+
+function addTokenToVector(vector: number[], token: string, weight: number): void {
+  const hash = hashToken(token);
+  const index = hash % LOCAL_EMBEDDING_DIMENSIONS;
+  const sign = hash & 1 ? 1 : -1;
+  vector[index] = (vector[index] ?? 0) + sign * weight;
+}
+
+function generateLocalEmbedding(text: string): number[] {
+  const tokens = tokenize(text);
+
+  if (tokens.length === 0) {
+    throw new Error('Texto vazio não pode gerar embedding.');
+  }
+
+  const vector = Array.from({ length: LOCAL_EMBEDDING_DIMENSIONS }, () => 0);
+
+  tokens.forEach((token, index) => {
+    addTokenToVector(vector, token, 1);
+
+    const nextToken = tokens[index + 1];
+    if (nextToken) {
+      addTokenToVector(vector, `${token}_${nextToken}`, 0.65);
+    }
+  });
+
+  const magnitude = Math.sqrt(vector.reduce((total, value) => total + value * value, 0));
+
+  return vector.map((value) => (magnitude > 0 ? value / magnitude : 0));
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -33,6 +91,10 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
   if (!normalizedText) {
     throw new Error('Texto vazio não pode gerar embedding.');
+  }
+
+  if (getAiProvider() === 'local') {
+    return generateLocalEmbedding(normalizedText);
   }
 
   const response = await getOpenAIClient().embeddings.create({
@@ -50,6 +112,10 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 export async function generateEmbeddingsBatch(texts: string[]): Promise<number[][]> {
+  if (getAiProvider() === 'local') {
+    return texts.map((text) => generateLocalEmbedding(text));
+  }
+
   const embeddings: number[][] = [];
 
   for (let index = 0; index < texts.length; index += EMBEDDING_BATCH_SIZE) {
