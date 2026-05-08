@@ -11,7 +11,8 @@ const CHAT_MODEL = 'gpt-4o';
 const OPENAI_SIMILARITY_THRESHOLD = 0.75;
 const LOCAL_SIMILARITY_THRESHOLD = 0.08;
 const TOP_K = 5;
-const NO_CONTEXT_ANSWER = 'Não encontrei essa informação na base de conhecimento.';
+const NO_CONTEXT_ANSWER =
+  'Não encontrei essa informação na base de conhecimento. Envie uma pergunta sobre os documentos já indexados ou faça upload dos arquivos da Minerion para testar.';
 
 let openaiClient: OpenAI | null = null;
 
@@ -125,6 +126,37 @@ function mapSources(chunks: RetrievedChunk[]): Source[] {
   }));
 }
 
+function normalizeQuestionText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getStaticAssistantReply(question: string): string | null {
+  const normalizedQuestion = normalizeQuestionText(question);
+  const greetings = new Set(['oi', 'ola', 'opa', 'e ai', 'bom dia', 'boa tarde', 'boa noite', 'hello', 'hi']);
+  const thanks = new Set(['obrigado', 'obrigada', 'valeu', 'thanks']);
+  const helpRequests = new Set(['ajuda', 'me ajuda', 'o que voce faz', 'o que posso perguntar']);
+
+  if (greetings.has(normalizedQuestion)) {
+    return 'Olá! Sou o assistente RAG Minerion. Posso responder perguntas com base nos documentos indexados, como módulos, segmentos, história, soluções e contatos da Minerion.';
+  }
+
+  if (thanks.has(normalizedQuestion)) {
+    return 'De nada! Quando quiser, pergunte algo sobre os documentos da Minerion que foram indexados.';
+  }
+
+  if (helpRequests.has(normalizedQuestion)) {
+    return 'Você pode perguntar sobre a Minerion usando os documentos cadastrados. Exemplos: "Quais módulos a Minerion oferece?", "Quais segmentos são atendidos?" ou "Quando a Delphi virou Minerion?".';
+  }
+
+  return null;
+}
+
 function splitSentences(text: string): string[] {
   return text
     .replace(/\s+/g, ' ')
@@ -233,6 +265,16 @@ async function retrieveRelevantChunks(db: Kysely<Database>, question: string): P
 }
 
 export async function answerQuestion(params: AnswerParams): Promise<AnswerResult> {
+  const staticReply = getStaticAssistantReply(params.question);
+
+  if (staticReply) {
+    return {
+      answer: staticReply,
+      sources: [],
+      tokensUsed: 0
+    };
+  }
+
   const chunks = await retrieveRelevantChunks(params.db, params.question);
 
   if (chunks.length === 0) {
@@ -265,6 +307,15 @@ export async function answerQuestion(params: AnswerParams): Promise<AnswerResult
 }
 
 export async function streamAnswerQuestion(params: AnswerParams): Promise<AnswerStreamResult> {
+  const staticReply = getStaticAssistantReply(params.question);
+
+  if (staticReply) {
+    return {
+      sources: [],
+      fallbackAnswer: staticReply
+    };
+  }
+
   const chunks = await retrieveRelevantChunks(params.db, params.question);
 
   if (chunks.length === 0) {
