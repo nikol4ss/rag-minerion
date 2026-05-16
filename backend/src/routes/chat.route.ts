@@ -15,12 +15,12 @@ interface StreamConversationEvent {
   type: 'conversation';
   conversationId: string;
 }
-
+dasd
 interface StreamSourcesEvent {
   type: 'sources';
   sources: Source[];
-}
-
+}d
+dsa
 interface StreamDeltaEvent {
   type: 'delta';
   delta: string;
