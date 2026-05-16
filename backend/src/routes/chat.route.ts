@@ -9,18 +9,16 @@ import {
 import type { MessageRole } from '../db/types.js';
 import type { Source } from '../services/retrieval.service.js';
 import { answerQuestion, streamAnswerQuestion } from '../services/retrieval.service.js';
-impordt { errorMessage } from './errors.js';
-dd
+
 interface StreamConversationEvent {
   type: 'conversation';
   conversationId: string;
 }
-dasd
+
 interface StreamSourcesEvent {
   type: 'sources';
   sources: Source[];
-}d
-dsa
+}
 interface StreamDeltaEvent {
   type: 'delta';
   delta: string;
