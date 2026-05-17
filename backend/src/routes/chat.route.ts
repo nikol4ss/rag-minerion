@@ -15,10 +15,6 @@ interface StreamConversationEvent {
   conversationId: string;
 }
 
-interface setInterval(() => {
-  
-}, interval);
-
 interface StreamSourcesEvent {
   type: 'sources';
   sources: Source[];
